@@ -1,0 +1,23 @@
+{
+  "name": "looker_hello_world_viz",
+  "version": "1.0.0",
+  "description": "",
+  "main": "looker_hello_world_viz.js",
+  "dependencies": {
+    "chart.js": "^3.3.2",
+    "jquery": "^3.6.0",
+    "lodash": "^4.17.21",
+    "rollup-plugin-chartjs-globals": "^0.1.1",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.0"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^4.7.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npx webpack serve"
+  },
+  "author": "Daniel Massarsky",
+  "license": "ISC"
+}
