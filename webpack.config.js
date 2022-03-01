@@ -20,5 +20,16 @@ module.exports = {
       static: {
         directory: path.join(__dirname, 'dist'),
       },
+      allowedHosts: 'all',
+      client: {
+        webSocketURL: {
+          hostname: 'localhost',
+          pathname: '/ws',
+          // password: 'dev-server',
+          port: 8080,
+          protocol: 'wss',
+          // username: 'webpack',
+        },
+      },
     },
 }

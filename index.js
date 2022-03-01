@@ -72,6 +72,7 @@ looker.plugins.visualizations.add({
     let updateConfig = false
 
     queryResponse.fields.measure_like.forEach(function(field) {
+
       if (!baseConfig[`color_${field.name}`]) { 
 
         baseConfig[`color_${field.name}`] = {
@@ -82,10 +83,11 @@ looker.plugins.visualizations.add({
           section: "Series"
         }
 
+        updateConfig = true
+
       }
 
-      if (!baseConfig[`elemtype_${field.name}`]) { 
-
+      if (!baseConfig[`elemtype_${field.name}`]) {
         baseConfig[`elemtype_${field.name}`] = {
           label: `${field.label_short} Type`,
           default: "bar",
@@ -98,17 +100,38 @@ looker.plugins.visualizations.add({
           section: "Series"
         }
         
+        updateConfig = true
+
       }
 
-      updateConfig = true
+      if (!baseConfig[`axis_${field.name}`]) {
+
+        baseConfig[`axis_${field.name}`] = {
+          label: `${field.label_short} Axis`,
+          default: "y",
+          type: "string",
+          values: [
+            {"Left": "y"},
+            {"Right": "y1"}
+          ],
+          display: "radio",
+          section: "Series"
+        }
+
+        updateConfig = true
+        
+      }
+
+    
     })
     
     updateConfig && this.trigger('registerOptions', baseConfig) // register options with parent page to update visConfig
 
     console.log({ data, config, details, queryResponse })
     
-    console.log(viz)
     viz.data.datasets = []
+
+    let useY1axis = false
 
     _.forEach(queryResponse.fields.measure_like,(m,i)=>{
       const ds = {
@@ -117,16 +140,39 @@ looker.plugins.visualizations.add({
         backgroundColor: [
           _.get(config,`color_${m.name}`) || colors[i]
         ],
-        type: _.get(config,`elemtype_${m.name}`) || 'bar'
+        type: _.get(config,`elemtype_${m.name}`) || 'bar',
+        yAxisID: _.get(config,`axis_${m.name}`) || 'y',
       }
+      
+      if (_.get(config,`axis_${m.name}`)=='y1') useY1axis = true
 
       ds.borderColor = ds.backgroundColor
       viz.data.datasets.push(ds)
+
     })
+
 
     const dim = queryResponse.fields.dimension_like[0]
 
     viz.data.labels = _.map(data, (d) => d[dim.name].value)
+
+    if (useY1axis){
+      viz.options.scales.y1 = {
+        type: 'linear',
+        display: true,
+        position: 'right',
+
+        // grid line settings
+        grid: {
+          drawOnChartArea: false, // only want the grid lines for one axis to show up
+        },
+      }
+
+      viz.options.scales.y.position = 'left'
+
+    } else if ( _.get(viz,'options.scales.y1')){
+      viz.options.scales.y1.display = false
+    }
 
     viz.options.scales.y.stacked = config.seriesType == 'stack'
     viz.options.scales.x.stacked = config.seriesType == 'stack'
